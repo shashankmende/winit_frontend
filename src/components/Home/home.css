@@ -1,0 +1,140 @@
+
+*{
+    font-family: sans-serif !important ;
+}
+
+
+.home_bg_container {
+    
+    width: 80%;
+    margin: auto;
+    /* border: 1px solid red; */
+    height: 100vh;
+    padding-top: 20px;
+}
+
+.select-add-button-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 400px;
+    /* height: 45px; */
+    margin-top: 35px;
+
+}
+
+.tabs_container {
+    display: flex;
+    gap: 40px;
+    margin-top: 40px;
+}
+.dropdown .dropdown-menu .dropdown-item {
+    cursor: pointer;
+}
+
+.tab_button {
+    background-color: #f8f9fa; 
+    border: 1px solid #dee2e6; 
+    color: #495057; 
+    margin: 0 5px; 
+    padding: 10px 20px;
+ cursor: pointer;
+}
+
+
+
+.tab_button.active {
+    background-color: #007bff; 
+    color: #ffffff; 
+    border-radius: 10px;
+}
+
+.tab_button:focus{
+    outline: none;
+}
+
+/* body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f9;
+} */
+
+.table-container {
+    width: 100%;
+    margin: 20px;
+    overflow-x: auto;
+    border: 1px solid black;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    /* border: 2px solid black; */
+    
+}
+
+thead {
+    background-color: red !important;
+    /* color: #ffffff; */
+    border-bottom: 1px solid black;
+}
+
+thead th {
+    padding: 12px;
+    text-align: left;
+    
+}
+
+tbody td {
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+     
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+    background-color: #e0f7fa;
+}
+
+.action-btn {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+/* .action-btn:hover {
+    background-color: #0056b3;
+} */
+
+input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.action_container {
+    display: flex;
+    justify-content: space-between;
+    /* border: 1px solid red; */
+    width: 80px;
+    border: none;
+}
+.action_container:focus{
+    outline: none;
+}
