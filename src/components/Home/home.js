@@ -25,6 +25,9 @@ const Home = () => {
     const [selectedCustomer, setSelectedCustomer] = useState('Select Customer Name');
     const [selectedCustomerId, setSelectedCustomerId] = useState(null);
     const [selectedTab, setSelectedTab] = useState(tabsList[0].tabName);
+    const [pendingTabData,setPendingTabData] =useState([])
+    const [approvedData,setApprovedData]= useState([])
+    const [rejectedData, setRejectedData] = useState([])
     const [selectedAdress,setselectedAdress]=useState('')
     const [tableData,setTableData]=useState('')
     const navigate = useNavigate();
@@ -67,6 +70,7 @@ const Home = () => {
                                 return {
                                     salesOrderNumber: customer.salesOrderNumber,
                                     customerName: customer.customerName,
+                                    customerId:customer.customerId,
                                     orderDate: orderDate,
                                     totalAmount: totalAmount
                                 };
@@ -86,6 +90,18 @@ const Home = () => {
     
         fetchTableData();
     }, []);
+
+
+   
+
+    const OnClickDeleteInHome = (cId) => {
+        const filteredList = tableData.filter(each => each.customerId !== cId);
+        setTableData(filteredList);
+    };
+
+    const onClickEditInHome = ()=>{
+        navigate('/addProduct')
+    }
 
     return (
         <div className='home_bg_container'>
@@ -156,8 +172,8 @@ const Home = () => {
                                 <td>{each.totalAmount}</td>
                                 <td>
                                     <button className="action_container">
-                                        <CiEdit color='black' size={25} style={{cursor:"pointer"}} />
-                                        <MdDeleteOutline size={25} style={{cursor:"pointer"}} />
+                                        <CiEdit color='black' size={25} style={{cursor:"pointer"}} onClick={()=>onClickEditInHome()} />
+                                        <MdDeleteOutline size={25} style={{ cursor: "pointer" }} onClick={() => OnClickDeleteInHome(each.customerId)} />
                                     </button>
                                 </td>
                             </tr>
