@@ -11,13 +11,17 @@ import { MdDone } from "react-icons/md";
 const AddProduct = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  // const { selectedCustomer, customerId, address } = location.state || {};
   const { selectedCustomer, customerId, address } = location.state || {};
+
   const [searchText, setSearchText] = useState("");
   const [products, setProducts] = useState([]);
   const [salesData, setSalesData] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState(new Set());
   const [successPopupOpen, setSuccessPopupOpen] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+  const [customerAddress,setcustomerAddress]=useState(address)
+  const [tempData,setTempData]=useState([])
 
   const onClickConfirm = async () => {
     try {
@@ -47,6 +51,7 @@ const AddProduct = () => {
             "Content-Type": "application/json",
           },
         });
+  
         if (response.status === 200) {
           setProducts(response.data);
         } else {
@@ -56,11 +61,14 @@ const AddProduct = () => {
         console.log("Error in hooks", error);
       }
     };
-
+  
     if (customerId) {
       getData(); // Only call getData if customerId is defined
     }
   }, [customerId]);
+  
+  
+
 
   const filteredProducts = products.filter((each) =>
     each.itemName.toLowerCase().includes(searchText.toLowerCase())
@@ -121,7 +129,7 @@ const AddProduct = () => {
         <div className="top_container">
           <div>
             <h4>{selectedCustomer}</h4>
-            <p>{address}</p>
+            <p>{customerAddress}</p>
           </div>
 
           <Popup
@@ -245,6 +253,8 @@ const AddProduct = () => {
                 </tbody>
               </table>
             </div>
+
+            
             <div className="summary_container mt-4">
               <div
                 style={{

@@ -1,0 +1,15 @@
+
+
+.stored_product_bg_container {
+    padding: 20px;
+
+}
+
+.stored_top_container{
+    display: flex;
+    justify-content: space-between
+}
+
+.table_container {
+    width: 100%;
+}

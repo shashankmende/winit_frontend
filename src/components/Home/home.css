@@ -138,3 +138,14 @@ input[type="checkbox"] {
 .action_container:focus{
     outline: none;
 }
+
+
+.delete_confirmation_popup_container {
+    /* border: 2px solid red; */
+    padding: 10px;
+    /* width: 350px; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
