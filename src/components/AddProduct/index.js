@@ -25,7 +25,7 @@ const AddProduct = () => {
 
   const onClickConfirm = async () => {
     try {
-      const url = 'http://localhost:3000/winit_services/pending_tab';
+      const url = 'https://winit-backend.onrender.com/winit_services/pending_tab';
       const response = await axios.post(url, { products: salesData }, {
         headers: {
           "Content-Type": "application/json",
@@ -45,7 +45,7 @@ const AddProduct = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const url = `http://localhost:3000/winit_services/products/${customerId}`;
+        const url = `https://winit-backend.onrender.com/winit_services/products/${customerId}`;
         const response = await axios.get(url, {
           headers: {
             "Content-Type": "application/json",

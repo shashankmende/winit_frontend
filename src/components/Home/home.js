@@ -6,7 +6,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Popup from "reactjs-popup";
 import { IoCloseSharp } from "react-icons/io5";
-import ApprovedComponent from "../ApprovedComponent";
+// import ApprovedComponent from "../ApprovedComponent";
 
 const customersList = [
   {
@@ -78,7 +78,7 @@ const Home = () => {
   useEffect(() => {
     const fetchTableData = async () => {
       try {
-        const url = "http://localhost:3000/winit_services/table_data";
+        const url = "https://winit-backend.onrender.com/winit_services/table_data";
         const response = await axios.get(url, {
           headers: {
             "Content-Type": "application/json",
@@ -132,8 +132,8 @@ const Home = () => {
 
   const OnClickDeleteInHome = async(cId,iCd) => {
     try {
-      // const url = `http://localhost:3000/winit_services/delete_specific_pending/${cId}`
-      const url = `http://localhost:3000/winit_services/rejected_tab/${cId}`
+      
+      const url = `https://winit-backend.onrender.com/winit_services/rejected_tab/${cId}`
 
 
       // const deleteUrlResponse = await axios.delete()
@@ -257,7 +257,7 @@ const Home = () => {
       );
 
       // Add checked items to approved data and send to the server
-      const url = "http://localhost:3000/winit_services/approved_tab";
+      const url = "https://winit-backend.onrender.com/winit_services/approved_tab";
       const response = await axios.post(url, checkedItems, {
         headers: {
           "Content-Type": "application/json",
@@ -308,7 +308,7 @@ const Home = () => {
   const onClickSelectedTab = async (tab) => {
     if (tab.tabName === 'Approved') {
         try {
-            const url = 'http://localhost:3000/winit_services/all_approved_products';
+            const url = 'https://winit-backend.onrender.com/winit_services/all_approved_products';
             const response = await axios.get(url, { headers: { "Content-Type": 'application/json' } });
             console.log("Response data of approved products", response.data.approvedProducts);
             setApprovedData(response.data.approvedProducts);
@@ -318,7 +318,7 @@ const Home = () => {
         }
     } else if (tab.tabName === "Rejected") {
         try {
-            const url = 'http://localhost:3000/winit_services/all_products_rejected';
+            const url = 'https://winit-backend.onrender.com/winit_services/all_products_rejected';
             const response = await axios.get(url, { headers: { "Content-Type": "application/json" } });
 
             if (response.status === 200) {

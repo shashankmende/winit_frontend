@@ -24,7 +24,7 @@ const StoreProduct = () => {
   useEffect(() => {
     const getPendingTable = async () => {
       try {
-        const url = `http://localhost:3000/winit_services/pending_products/${customerId}`;
+        const url = `https://winit-backend.onrender.com/winit_services/pending_products/${customerId}`;
         const response = await axios.get(url, {
           headers: {
             "Content-Type": "application/json",
@@ -47,7 +47,7 @@ const StoreProduct = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const url = `http://localhost:3000/winit_services/products/${customerId}`;
+        const url = `https://winit-backend.onrender.com/winit_services/products/${customerId}`;
         const response = await axios.get(url, {
           headers: {
             "Content-Type": "application/json",
@@ -130,7 +130,7 @@ const StoreProduct = () => {
   const onClickConfirm = async () => {
     try {
         console.log("Confirm button is clicked",renderingLst);
-        const url = "http://localhost:3000/winit_services/pending_tab_after_editing";
+        const url = "https://winit-backend.onrender.com/winit_services/pending_tab_after_editing";
         const response = await axios.put(
             url,
             { customerId, products: renderingLst },
