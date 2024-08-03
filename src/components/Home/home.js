@@ -6,6 +6,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Popup from "reactjs-popup";
 import { IoCloseSharp } from "react-icons/io5";
+import ApprovedComponent from "../ApprovedComponent";
 
 const customersList = [
   {
@@ -129,9 +130,16 @@ const Home = () => {
     fetchTableData();
   }, []);
 
-  const OnClickDeleteInHome = async(cId) => {
+  const OnClickDeleteInHome = async(cId,iCd) => {
     try {
-      const url = `http://localhost:3000/winit_services/delete_specific_pending/${cId}`
+      // const url = `http://localhost:3000/winit_services/delete_specific_pending/${cId}`
+      const url = `http://localhost:3000/winit_services/rejected_tab/${cId}`
+
+
+      // const deleteUrlResponse = await axios.delete()
+
+
+
 
       const response = await axios.delete(url,{
         headers:{
@@ -297,7 +305,55 @@ const Home = () => {
     }
   };
 
-  const returnResult = ()=>(
+  const onClickSelectedTab = async (tab) => {
+    if (tab.tabName === 'Approved') {
+        try {
+            const url = 'http://localhost:3000/winit_services/all_approved_products';
+            const response = await axios.get(url, { headers: { "Content-Type": 'application/json' } });
+            console.log("Response data of approved products", response.data.approvedProducts);
+            setApprovedData(response.data.approvedProducts);
+            setSelectedTab(tab.tabName);
+        } catch (error) {
+            console.log("Error in setting tab to approved", error);
+        }
+    } else if (tab.tabName === "Rejected") {
+        try {
+            const url = 'http://localhost:3000/winit_services/all_products_rejected';
+            const response = await axios.get(url, { headers: { "Content-Type": "application/json" } });
+
+            if (response.status === 200) {
+                const resultObj = response.data[0];
+                console.log('Response from rejected tab', resultObj.rejected);
+
+                // Map customer names to the rejected data
+                const updatedRejectedData = resultObj.rejected.map(product => {
+                    const customer = customersList.find(c => c.customerId === product.customerId);
+                    return {
+                        ...product,
+                        customerName: customer ? customer.customerName : 'Unknown'
+                    };
+                });
+
+                // Filter out unique objects based on customerId
+                const uniqueRejectedData = updatedRejectedData.filter((product, index, self) =>
+                    index === self.findIndex(p => p.customerId === product.customerId)
+                );
+
+                setRejectedData(uniqueRejectedData);
+                setSelectedTab("Rejected");
+            } else {
+                console.log("Error in making request");
+            }
+        } catch (error) {
+            console.log("Internal server error", error);
+        }
+    } else {
+        setSelectedTab(tabsList[0].tabName);
+    }
+};
+
+
+  const returnPendingResult = ()=>(
 
 
     <div className="home_bg_container">
@@ -349,7 +405,7 @@ const Home = () => {
               tab.tabName === selectedTab ? "active" : ""
             }`}
             type="button"
-            onClick={() => setSelectedTab(tab.tabName)}
+            onClick={() => onClickSelectedTab(tab)}
           >
             {tab.tabName}
           </button>
@@ -434,7 +490,7 @@ const Home = () => {
                                 type="button"
                                 className="btn btn-primary"
                                 onClick={() => {
-                                  OnClickDeleteInHome(each.customerId);
+                                  OnClickDeleteInHome(each.customerId,each.itemCode);
                                   close();
                                 }}
                               >
@@ -464,174 +520,363 @@ const Home = () => {
   )
 
 
-  // return (
-  //   <div className="home_bg_container">
-  //     <h1>Sales Order</h1>
-  //     <div className="select-add-button-container">
-  //       <div className="dropdown">
-  //         <button
-  //           className="btn btn-info dropdown-toggle p-2"
-  //           type="button"
-  //           id="dropdownMenuButton"
-  //           data-toggle="dropdown"
-  //           aria-haspopup="true"
-  //           aria-expanded="false"
-  //         >
-  //           {selectedCustomer}
-  //         </button>
-  //         <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-  //           {customersList.map((each) => (
-  //             <p
-  //               key={each.customerId}
-  //               onClick={() =>
-  //                 handleCustomerSelect(
-  //                   each.customerId,
-  //                   each.customerName,
-  //                   each.address
-  //                 )
-  //               }
-  //               className="dropdown-item"
-  //             >
-  //               {each.customerName}
-  //             </p>
-  //           ))}
-  //         </div>
-  //       </div>
-  //       <button
-  //         type="button"
-  //         className="btn btn-primary p-2 w-25"
-  //         onClick={handleAddClick}
-  //       >
-  //         Add
-  //       </button>
-  //     </div>
+  const returnApprovedResult =(lst)=>{
+    return (
+      <div className="home_bg_container">
+        <h1>Sales Order</h1>
+      <div className="select-add-button-container">
+        <div className="dropdown">
+          <button
+            className="btn btn-info dropdown-toggle p-2"
+            type="button"
+            id="dropdownMenuButton"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            {selectedCustomer}
+          </button>
+          <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            {customersList.map((each) => (
+              <p
+                key={each.customerId}
+                onClick={() =>
+                  handleCustomerSelect(
+                    each.customerId,
+                    each.customerName,
+                    each.address
+                  )
+                }
+                className="dropdown-item"
+              >
+                {each.customerName}
+              </p>
+            ))}
+          </div>
+        </div>
+        <button
+          type="button"
+          className="btn btn-primary p-2 w-25"
+          onClick={handleAddClick}
+        >
+          Add
+        </button>
+      </div>
 
-  //     <div className="tabs_container">
-  //       {tabsList.map((tab) => (
-  //         <button
-  //           key={tab.id}
-  //           className={`tab_button ${
-  //             tab.tabName === selectedTab ? "active" : ""
-  //           }`}
-  //           type="button"
-  //           onClick={() => setSelectedTab(tab.tabName)}
-  //         >
-  //           {tab.tabName}
-  //         </button>
-  //       ))}
-  //     </div>
+      <div className="tabs_container">
+        {tabsList.map((tab) => (
+          <button
+            key={tab.id}
+            className={`tab_button ${
+              tab.tabName === selectedTab ? "active" : ""
+            }`}
+            type="button"
+            onClick={() => onClickSelectedTab(tab)}
+          >
+            {tab.tabName}
+          </button>
+        ))}
+      </div>
+      
 
-  //     <div className="table-container">
-  //       <table>
-  //         <thead>
-  //           <tr>
-  //             <th>Select</th>
-  //             <th>Sales Order Number</th>
-  //             <th>Customer Name</th>
-  //             <th>Order Date</th>
-  //             <th>Total Amount</th>
-  //             <th>Action</th>
-  //           </tr>
-  //         </thead>
-  //         <tbody>
-  //           {tableData.transformedData &&
-  //             tableData.transformedData.map((each, index) => (
-  //               <tr key={index}>
-  //                 <td>
-  //                   <input
-  //                     type="checkbox"
-  //                     checked={each.isChecked || false}
-  //                     onClick={(event) =>
-  //                       onClickCheckBoxInPendingTab(event, each.customerId)
-  //                     }
-  //                   />
-  //                 </td>
-  //                 <td>{each.salesOrderNumber}</td>
-  //                 <td>{each.customerName}</td>
-  //                 <td>{each.orderDate}</td>
-  //                 <td>{each.totalAmount}</td>
-  //                 <td>
-  //                   <button className="action_container">
-  //                     <CiEdit
-  //                       color="black"
-  //                       size={25}
-  //                       style={{ cursor: "pointer" }}
-  //                       onClick={() => onClickEditInHome(each.customerId)}
-  //                     />
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              {/* <th>Select</th> */}
+              <th>Sales Order Number</th>
+              <th>Customer Name</th>
+              <th>Order Date</th>
+              <th>Total Amount</th>
+              {/* <th>Action</th> */}
+            </tr>
+          </thead>
+          <tbody>
+            {lst &&
+              lst.map((each, index) => (
+                <tr key={index}>
+                  {/* <td>
+                    <input
+                      type="checkbox"
+                      checked={each.isChecked || false}
+                      onClick={(event) =>
+                        onClickCheckBoxInPendingTab(event, each.customerId)
+                      }
+                    />
+                  </td> */}
+                  <td>{each.salesOrderNumber}</td>
+                  <td>{each.customerName}</td>
+                  <td>{each.orderDate}</td>
+                  <td>{each.totalAmount}</td>
+                  {/* <td>
+                    <button className="action_container">
+                      <CiEdit
+                        color="black"
+                        size={25}
+                        style={{ cursor: "pointer" }}
+                        onClick={() => onClickEditInHome(each.customerId)}
+                      />
 
-  //                     <Popup
-  //                       trigger={
-  //                         <MdDeleteOutline
-  //                           size={25}
-  //                           style={{ cursor: "pointer" }}
-  //                         />
-  //                       }
-  //                       modal
-  //                       contentStyle={{
-  //                         width: "700px",
-  //                         borderRadius: "10px",
-  //                       }}
-  //                     >
-  //                       {(close) => (
-  //                         <div className="delete_confirmation_popup_container">
-  //                           <IoCloseSharp
-  //                             size={25}
-  //                             color="red"
-  //                             style={{
-  //                               cursor: "pointer",
-  //                               position: "absolute",
-  //                               right: "0",
-  //                             }}
-  //                           />
-  //                           <h4 style={{ marginTop: "30px" }}>
-  //                             Do you really want to delete this item from Store?
-  //                           </h4>
-  //                           <p>Click Confirm to do so...</p>
-  //                           <div className="text-center ">
-  //                             <button
-  //                               type="button"
-  //                               className="btn btn-secondary mr-5"
-  //                               onClick={() => close()}
-  //                             >
-  //                               Clear
-  //                             </button>
-  //                             <button
-  //                               type="button"
-  //                               className="btn btn-primary"
-  //                               onClick={() => {
-  //                                 OnClickDeleteInHome(each.customerId);
-  //                                 close();
-  //                               }}
-  //                             >
-  //                               Confirm
-  //                             </button>
-  //                           </div>
-  //                         </div>
-  //                       )}
-  //                     </Popup>
-  //                   </button>
-  //                 </td>
-  //               </tr>
-  //             ))}
-  //         </tbody>
-  //       </table>
-  //     </div>
-  //     <div className="clear_save_button text-center mt-5">
-  //       <button className="btn btn-secondary mr-5">Clear</button>
-  //       <button className="btn btn-primary" onClick={onClickSaveButton}>
-  //         Save
-  //       </button>
-  //     </div>
-  //   </div>
-  // );
+                      <Popup
+                        trigger={
+                          <MdDeleteOutline
+                            size={25}
+                            style={{ cursor: "pointer" }}
+                          />
+                        }
+                        modal
+                        contentStyle={{
+                          width: "700px",
+                          borderRadius: "10px",
+                        }}
+                      >
+                        {(close) => (
+                          <div className="delete_confirmation_popup_container">
+                            <IoCloseSharp
+                              size={25}
+                              color="red"
+                              style={{
+                                cursor: "pointer",
+                                position: "absolute",
+                                right: "0",
+                              }}
+                            />
+                            <h4 style={{ marginTop: "30px" }}>
+                              Do you really want to delete this item from Store?
+                            </h4>
+                            <p>Click Confirm to do so...</p>
+                            <div className="text-center ">
+                              <button
+                                type="button"
+                                className="btn btn-secondary mr-5"
+                                onClick={() => close()}
+                              >
+                                Clear
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={() => {
+                                  OnClickDeleteInHome(each.customerId);
+                                  close();
+                                }}
+                              >
+                                Confirm
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </Popup>
+                    </button>
+                  </td> */}
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
+      
+
+      <div className="clear_save_button text-center mt-5">
+        <button className="btn btn-secondary mr-5">Clear</button>
+        <button className="btn btn-primary" onClick={onClickSaveButton}>
+          Save
+        </button>
+      </div>
+      
+      </div>
+    )
+  }
 
 
-  
+  const returnRejectedResult =(lst)=>{
+    return (
+      <div className="home_bg_container">
+          <h1>Sales Order</h1>
+        <div className="select-add-button-container">
+          <div className="dropdown">
+            <button
+              className="btn btn-info dropdown-toggle p-2"
+              type="button"
+              id="dropdownMenuButton"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              {selectedCustomer}
+            </button>
+            <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {customersList.map((each) => (
+                <p
+                  key={each.customerId}
+                  onClick={() =>
+                    handleCustomerSelect(
+                      each.customerId,
+                      each.customerName,
+                      each.address
+                    )
+                  }
+                  className="dropdown-item"
+                >
+                  {each.customerName}
+                </p>
+              ))}
+            </div>
+          </div>
+          <button
+            type="button"
+            className="btn btn-primary p-2 w-25"
+            onClick={handleAddClick}
+          >
+            Add
+          </button>
+        </div>
+
+        <div className="tabs_container">
+        {tabsList.map((tab) => (
+          <button
+            key={tab.id}
+            className={`tab_button ${
+              tab.tabName === selectedTab ? "active" : ""
+            }`}
+            type="button"
+            onClick={() => onClickSelectedTab(tab)}
+          >
+            {tab.tabName}
+          </button>
+        ))}
+      </div>
+
+
+
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              {/* <th>Select</th> */}
+              <th>Sales Order Number</th>
+              <th>Customer Name</th>
+              <th>Order Date</th>
+              <th>Total Amount</th>
+              {/* <th>Action</th> */}
+            </tr>
+          </thead>
+          <tbody>
+            {lst &&
+              lst.map((each, index) => (
+                <tr key={index}>
+                  {/* <td>
+                    <input
+                      type="checkbox"
+                      checked={each.isChecked || false}
+                      onClick={(event) =>
+                        onClickCheckBoxInPendingTab(event, each.customerId)
+                      }
+                    />
+                  </td> */}
+                  <td>{each.salesOrderNumber}</td>
+                  <td>{each.customerName}</td>
+                  <td>{each.orderDate}</td>
+                  <td>{each.totalAmount}</td>
+                  {/* <td>
+                    <button className="action_container">
+                      <CiEdit
+                        color="black"
+                        size={25}
+                        style={{ cursor: "pointer" }}
+                        onClick={() => onClickEditInHome(each.customerId)}
+                      />
+
+                      <Popup
+                        trigger={
+                          <MdDeleteOutline
+                            size={25}
+                            style={{ cursor: "pointer" }}
+                          />
+                        }
+                        modal
+                        contentStyle={{
+                          width: "700px",
+                          borderRadius: "10px",
+                        }}
+                      >
+                        {(close) => (
+                          <div className="delete_confirmation_popup_container">
+                            <IoCloseSharp
+                              size={25}
+                              color="red"
+                              style={{
+                                cursor: "pointer",
+                                position: "absolute",
+                                right: "0",
+                              }}
+                            />
+                            <h4 style={{ marginTop: "30px" }}>
+                              Do you really want to delete this item from Store?
+                            </h4>
+                            <p>Click Confirm to do so...</p>
+                            <div className="text-center ">
+                              <button
+                                type="button"
+                                className="btn btn-secondary mr-5"
+                                onClick={() => close()}
+                              >
+                                Clear
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={() => {
+                                  OnClickDeleteInHome(each.customerId);
+                                  close();
+                                }}
+                              >
+                                Confirm
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </Popup>
+                    </button>
+                  </td> */}
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
+
+
+
+
+
+
+      </div>
+    )
+
+  }
+
+
+  const FinalResult = ()=>{
+    switch (selectedTab){
+      case tabsList[0].tabName:
+        return returnPendingResult()
+      case tabsList[1].tabName:
+        return returnApprovedResult(approvedData)
+        break;
+      case tabsList[2].tabName:
+        return returnRejectedResult(rejectedData)
+        break;
+    }
+  }
 
 
 
   return (
-    returnResult()
+    
+    
+        FinalResult()
+      
+    
+    
   )
 };
 

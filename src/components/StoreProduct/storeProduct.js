@@ -115,7 +115,7 @@ const StoreProduct = () => {
   };
 
   const handleQuantityChange = (e) => {
-    setNewQuantity(e.target.value);
+    setNewQuantity(parseInt(e.target.value));
   };
 
   const saveNewQuantity = (itemCode) => {
@@ -129,25 +129,26 @@ const StoreProduct = () => {
 
   const onClickConfirm = async () => {
     try {
-      console.log("Confirm button is clicked");
-      const url = "http://localhost:3000/winit_services/pending_tab";
-      const response = await axios.post(
-        url,
-        { products: renderingLst },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+        console.log("Confirm button is clicked",renderingLst);
+        const url = "http://localhost:3000/winit_services/pending_tab_after_editing";
+        const response = await axios.put(
+            url,
+            { customerId, products: renderingLst },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
 
-      if (response.status === 200) {
-        console.log("Database updated successfully", response);
-      }
+        if (response.status === 200) {
+            console.log("Database updated successfully", response);
+        }
     } catch (error) {
-      console.log("Error in making request", error);
+        console.log("Error in making request", error);
     }
-  };
+};
+
 
   const totalItems = renderingLst.length;
   const totalQuantity = renderingLst.reduce(
@@ -350,8 +351,11 @@ const StoreProduct = () => {
               type="button"
               className="btn btn-secondary mr-5"
               // onClick={handleClear}
+              onClick={()=>{
+                navigate('/')
+              }}
             >
-              Clear
+              Cancel
             </button>
             <Popup
               // open={successPopupOpen}
