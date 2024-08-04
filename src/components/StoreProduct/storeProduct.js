@@ -19,18 +19,18 @@ const StoreProduct = () => {
   const [dataFromBackend, setBackendData] = useState([]);
   const [renderingLst, setRenderingLst] = useState([]);
   const [editingItem, setEditingItem] = useState(null);
-  const [newQuantity, setNewQuantity] = useState("");
+  const [newQuantity, setNewQuantity] = useState();
 
   useEffect(() => {
     const getPendingTable = async () => {
       try {
-        const url = `https://winit-backend.onrender.com/winit_services/pending_products/${customerId}`;
+        const url = `https://winit-backend-1.onrender.com/winit_services/pending_products/${customerId}`;
         const response = await axios.get(url, {
           headers: {
             "Content-Type": "application/json",
           },
         });
-        console.log("response from add products route", response);
+        
 
         setBackendData(response.data.pendingProducts);
         setRenderingLst(response.data.pendingProducts);
@@ -47,7 +47,7 @@ const StoreProduct = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const url = `https://winit-backend.onrender.com/winit_services/products/${customerId}`;
+        const url = `https://winit-backend-1.onrender.com/winit_services/products/${customerId}`;
         const response = await axios.get(url, {
           headers: {
             "Content-Type": "application/json",
@@ -119,35 +119,51 @@ const StoreProduct = () => {
   };
 
   const saveNewQuantity = (itemCode) => {
-    setRenderingLst((prevList) =>
-      prevList.map((item) =>
-        item.itemCode === itemCode ? { ...item, quantity: newQuantity } : item
-      )
-    );
+    
+  
+    setRenderingLst((prevList) => {
+      const updatedList = prevList.map((item) =>
+        item.itemCode === itemCode
+          ? {
+              ...item,
+              quantity: newQuantity,
+              totalPrice: parseFloat((newQuantity * item.unitPrice).toFixed(2)),
+            }
+          : item
+      );
+      
+      return updatedList;
+    });
+  
     setEditingItem(null);
   };
+  
 
   const onClickConfirm = async () => {
     try {
-        console.log("Confirm button is clicked",renderingLst);
-        const url = "https://winit-backend.onrender.com/winit_services/pending_tab_after_editing";
-        const response = await axios.put(
-            url,
-            { customerId, products: renderingLst },
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }
-        );
+        
+        const url = `https://winit-backend-1.onrender.com/winit_services/save_changes_to_pending_after_edit/${customerId}`;
+
+        
+
+        const response = await axios.put(url, renderingLst, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        
 
         if (response.status === 200) {
-            console.log("Database updated successfully", response);
+            console.log("Database updated successfully", response.data);
+        } else {
+            console.log("Unexpected response status:", response.status);
         }
     } catch (error) {
-        console.log("Error in making request", error);
+        console.error("Error in making request", error);
     }
 };
+
 
 
   const totalItems = renderingLst.length;
@@ -158,6 +174,9 @@ const StoreProduct = () => {
   const totalPrice = renderingLst
     .reduce((acc, item) => acc + item.quantity * item.unitPrice, 0)
     .toFixed(2);
+
+
+
 
   return (
     <div className="stored_product_bg_container">

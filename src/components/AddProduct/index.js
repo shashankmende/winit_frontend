@@ -21,11 +21,11 @@ const AddProduct = () => {
   const [successPopupOpen, setSuccessPopupOpen] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
   const [customerAddress,setcustomerAddress]=useState(address)
-  const [tempData,setTempData]=useState([])
+  
 
   const onClickConfirm = async () => {
     try {
-      const url = 'https://winit-backend.onrender.com/winit_services/pending_tab';
+      const url = 'https://winit-backend-1.onrender.com/winit_services/pending_tab';
       const response = await axios.post(url, { products: salesData }, {
         headers: {
           "Content-Type": "application/json",
@@ -45,7 +45,7 @@ const AddProduct = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const url = `https://winit-backend.onrender.com/winit_services/products/${customerId}`;
+        const url = `https://winit-backend-1.onrender.com/winit_services/products/${customerId}`;
         const response = await axios.get(url, {
           headers: {
             "Content-Type": "application/json",

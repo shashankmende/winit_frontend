@@ -6,7 +6,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Popup from "reactjs-popup";
 import { IoCloseSharp } from "react-icons/io5";
-// import ApprovedComponent from "../ApprovedComponent";
+
 
 const customersList = [
   {
@@ -78,68 +78,73 @@ const Home = () => {
   useEffect(() => {
     const fetchTableData = async () => {
       try {
-        const url = "https://winit-backend.onrender.com/winit_services/table_data";
+        const url = "https://winit-backend-1.onrender.com/winit_services/table_data";
         const response = await axios.get(url, {
           headers: {
             "Content-Type": "application/json",
           },
         });
-
+  
         if (response.status === 200) {
           const responseObject = response.data.customerSummary;
-
+  
+  
+  
           const customersMap = customersList.reduce((map, customer) => {
             map[customer.customerId] = customer;
             return map;
           }, {});
-
+  
           const returnObject = (resObj, custMap) => {
             return resObj
-              .map(({ customerId, orderDate, totalAmount }) => {
-                const customer = custMap[customerId];
+              .map((item) => {
+                const customer = custMap[item.customerId];
+  
                 if (customer) {
+                  const quantity = item.quantity !== undefined ? parseFloat(item.quantity) : 0;
+                  const unitPrice = item.unitPrice !== undefined ? parseFloat(item.unitPrice) : 0;
+                  const totalAmount = quantity * unitPrice;
+  
+                 
+  
                   return {
                     salesOrderNumber: customer.salesOrderNumber,
                     customerName: customer.customerName,
                     customerId: customer.customerId,
-                    orderDate: orderDate,
+                    orderDate: item.orderDate,
                     totalAmount: totalAmount,
-                    isChecked: false
-                    
+                    isChecked: false,
                   };
                 }
                 return null;
               })
               .filter((item) => item !== null);
           };
-
+  
           const transformedData = returnObject(responseObject, customersMap);
-
+  
           const requiredObject = {
             ...responseObject,
-            transformedData, // Add transformed data as a new field in the object
+            transformedData, 
           };
-          console.log("required object", requiredObject);
+          
           setTableData(requiredObject);
         }
       } catch (error) {
         console.error("Error fetching table data:", error);
       }
     };
-
+  
     fetchTableData();
   }, []);
+  
+  
+  
 
   const OnClickDeleteInHome = async(cId,iCd) => {
     try {
       
-      const url = `https://winit-backend.onrender.com/winit_services/rejected_tab/${cId}`
-
-
-      // const deleteUrlResponse = await axios.delete()
-
-
-
+      const url = `https://winit-backend-1.onrender.com/winit_services/rejected_tab/${cId}`
 
       const response = await axios.delete(url,{
         headers:{
@@ -156,7 +161,7 @@ const Home = () => {
       );
       setPendingTabData(filteredList);
   
-      // Additionally, remove the item from tableData.transformedData if needed
+      
       setTableData((prevData) => ({
         ...prevData,
         transformedData: prevData.transformedData.filter(
@@ -175,13 +180,13 @@ const Home = () => {
   };
 
   const onClickEditInHome = (customerId) => {
-    // Find the customer based on the customerId
+    
     const customer = customersList.find(cust => cust.customerId === customerId);
   
-    // Extract the address from the customer object
+    
     const address = customer ? customer.address : '';
   
-    // Navigate to the new route with the customer information
+    
     navigate("/storedProduct", {
       state: {
         selectedCustomer: customer.customerName,
@@ -201,13 +206,13 @@ const Home = () => {
       return eachItem;
     });
 
-    // Update tableData with the modified transformedData
+    
     setTableData((prevData) => ({
       ...prevData,
       transformedData: updatedTransformedData,
     }));
 
-    // Handle the item in approvedData based on the checkbox state
+    
     setApprovedData((prevData) => {
       if (isChecked) {
         const newApprovedData = [
@@ -231,7 +236,7 @@ const Home = () => {
       }
     });
 
-    // Handle the item in pendingTabData based on the checkbox state
+    
     setPendingTabData((prevData) => {
       if (!isChecked) {
         return [
@@ -248,7 +253,7 @@ const Home = () => {
 
   const onClickSaveButton = async () => {
     try {
-      // Filter checked and unchecked items
+      
       const checkedItems = tableData.transformedData.filter(
         (item) => item.isChecked
       );
@@ -256,19 +261,19 @@ const Home = () => {
         (item) => !item.isChecked
       );
 
-      // Add checked items to approved data and send to the server
-      const url = "https://winit-backend.onrender.com/winit_services/approved_tab";
+      
+      const url = "https://winit-backend-1.onrender.com/winit_services/approved_tab";
       const response = await axios.post(url, checkedItems, {
         headers: {
           "Content-Type": "application/json",
         },
       });
 
-      // Delete checked items from the pending tab on the server
+      
       const deleteUrl =
-        "http://localhost:3000/winit_services/delete_approved_data";
+        "https://winit-backend-1.onrender.com/winit_services/delete_approved_data";
       const deleteResponse = await axios.delete(deleteUrl, {
-        data: checkedItems, // Pass the checked items in the request body
+        data: checkedItems, 
         headers: {
           "Content-Type": "application/json",
         },
@@ -308,9 +313,9 @@ const Home = () => {
   const onClickSelectedTab = async (tab) => {
     if (tab.tabName === 'Approved') {
         try {
-            const url = 'https://winit-backend.onrender.com/winit_services/all_approved_products';
+            const url = 'https://winit-backend-1.onrender.com/winit_services/all_approved_products';
             const response = await axios.get(url, { headers: { "Content-Type": 'application/json' } });
-            console.log("Response data of approved products", response.data.approvedProducts);
+            
             setApprovedData(response.data.approvedProducts);
             setSelectedTab(tab.tabName);
         } catch (error) {
@@ -318,12 +323,12 @@ const Home = () => {
         }
     } else if (tab.tabName === "Rejected") {
         try {
-            const url = 'https://winit-backend.onrender.com/winit_services/all_products_rejected';
+            const url = 'https://winit-backend-1.onrender.com/winit_services/all_products_rejected';
             const response = await axios.get(url, { headers: { "Content-Type": "application/json" } });
 
             if (response.status === 200) {
                 const resultObj = response.data[0];
-                console.log('Response from rejected tab', resultObj.rejected);
+                
 
                 // Map customer names to the rejected data
                 const updatedRejectedData = resultObj.rejected.map(product => {
@@ -440,6 +445,7 @@ const Home = () => {
                   <td>{each.salesOrderNumber}</td>
                   <td>{each.customerName}</td>
                   <td>{each.orderDate}</td>
+
                   <td>{each.totalAmount}</td>
                   <td>
                     <button className="action_container">
@@ -595,80 +601,12 @@ const Home = () => {
             {lst &&
               lst.map((each, index) => (
                 <tr key={index}>
-                  {/* <td>
-                    <input
-                      type="checkbox"
-                      checked={each.isChecked || false}
-                      onClick={(event) =>
-                        onClickCheckBoxInPendingTab(event, each.customerId)
-                      }
-                    />
-                  </td> */}
+                  
                   <td>{each.salesOrderNumber}</td>
                   <td>{each.customerName}</td>
                   <td>{each.orderDate}</td>
                   <td>{each.totalAmount}</td>
-                  {/* <td>
-                    <button className="action_container">
-                      <CiEdit
-                        color="black"
-                        size={25}
-                        style={{ cursor: "pointer" }}
-                        onClick={() => onClickEditInHome(each.customerId)}
-                      />
-
-                      <Popup
-                        trigger={
-                          <MdDeleteOutline
-                            size={25}
-                            style={{ cursor: "pointer" }}
-                          />
-                        }
-                        modal
-                        contentStyle={{
-                          width: "700px",
-                          borderRadius: "10px",
-                        }}
-                      >
-                        {(close) => (
-                          <div className="delete_confirmation_popup_container">
-                            <IoCloseSharp
-                              size={25}
-                              color="red"
-                              style={{
-                                cursor: "pointer",
-                                position: "absolute",
-                                right: "0",
-                              }}
-                            />
-                            <h4 style={{ marginTop: "30px" }}>
-                              Do you really want to delete this item from Store?
-                            </h4>
-                            <p>Click Confirm to do so...</p>
-                            <div className="text-center ">
-                              <button
-                                type="button"
-                                className="btn btn-secondary mr-5"
-                                onClick={() => close()}
-                              >
-                                Clear
-                              </button>
-                              <button
-                                type="button"
-                                className="btn btn-primary"
-                                onClick={() => {
-                                  OnClickDeleteInHome(each.customerId);
-                                  close();
-                                }}
-                              >
-                                Confirm
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </Popup>
-                    </button>
-                  </td> */}
+                  
                 </tr>
               ))}
           </tbody>
@@ -676,12 +614,7 @@ const Home = () => {
       </div>
       
 
-      <div className="clear_save_button text-center mt-5">
-        <button className="btn btn-secondary mr-5">Clear</button>
-        <button className="btn btn-primary" onClick={onClickSaveButton}>
-          Save
-        </button>
-      </div>
+
       
       </div>
     )
@@ -861,10 +794,12 @@ const Home = () => {
         return returnPendingResult()
       case tabsList[1].tabName:
         return returnApprovedResult(approvedData)
-        break;
+        
       case tabsList[2].tabName:
         return returnRejectedResult(rejectedData)
+      default:
         break;
+        
     }
   }
 
